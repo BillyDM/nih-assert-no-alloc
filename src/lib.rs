@@ -140,7 +140,7 @@ pub fn reset_violation_count() {
 ///
 /// To use this crate, you must add the following in your `main.rs`:
 /// ```rust
-/// use assert_no_alloc::*;
+/// use nih_assert_no_alloc::*;
 /// // ...
 /// #[cfg(debug_assertions)]
 /// #[global_allocator]
@@ -150,7 +150,11 @@ pub struct AllocDisabler;
 
 #[cfg(not(all(feature = "disable_release", not(debug_assertions))))] // if not disabled
 impl AllocDisabler {
-	fn check(&self, layout: Layout) {
+	fn check(
+		&self,
+		#[allow(unused)]
+		layout: Layout
+	) {
 		let forbid_count = ALLOC_FORBID_COUNT.with(|f| f.get());
 		let permit_count = ALLOC_PERMIT_COUNT.with(|p| p.get());
 		if forbid_count > permit_count {
@@ -194,9 +198,10 @@ unsafe impl GlobalAlloc for AllocDisabler {
 /// Typical usage:
 ///
 /// ```rust
+/// # use nih_assert_no_alloc::*;
 /// let foo = PermitDrop::new(
 ///     permit_alloc(||
-///         Box::new(...)
+///         Box::new(42u32)
 ///     )
 /// );
 /// ```

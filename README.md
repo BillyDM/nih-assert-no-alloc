@@ -1,5 +1,8 @@
-assert_no_alloc
+nih_assert_no_alloc
 ===============
+
+> This is a fork of [assert_no_alloc](https://crates.io/crates/assert_no_alloc)
+> with patches for [NIH-plug](https://github.com/BillyDM/nih-plug).
 
 This crate provides a custom allocator that allows to temporarily disable
 memory (de)allocations for a thread. If a (de)allocation is attempted
@@ -9,8 +12,8 @@ It uses thread local storage for the "disabled-flag/counter", and thus
 should be thread safe, if the underlying allocator (currently hard-coded
 to `std::alloc::System`) is.
 
-[documentation @ docs.rs](https://docs.rs/assert_no_alloc/1.1.0/assert_no_alloc/),
-[crates.io](https://crates.io/crates/assert_no_alloc)
+[documentation @ docs.rs](https://docs.rs/nih_assert_no_alloc),
+[crates.io](https://crates.io/crates/nih_assert_no_alloc)
 
 Rationale
 ---------
@@ -47,7 +50,7 @@ nothing if built in `--release` mode.
 Second, use the allocator provided by this crate. Add this to `main.rs`:
 
 ```rust
-use assert_no_alloc::*;
+use nih_assert_no_alloc::*;
 
 #[cfg(debug_assertions)] // required when disable_release is set (default)
 #[global_allocator]
@@ -57,6 +60,7 @@ static A: AllocDisabler = AllocDisabler;
 Third, wrap code sections that may not allocate like this:
 
 ```rust
+use nih_assert_no_alloc::*;
 assert_no_alloc(|| {
 	println!("This code can not allocate.");
 });
@@ -68,12 +72,14 @@ Advanced use
 Values can be returned using:
 
 ```rust
-let answer = assert_no_alloc(|| { 42 });
+use nih_assert_no_alloc::*;
+let answer = assert_no_alloc(|| { 42u32 });
 ```
 
 The effect of `assert_no_alloc` can be overridden using `permit_alloc`:
 
 ```rust
+use nih_assert_no_alloc::*;
 assert_no_alloc(|| {
 	permit_alloc(|| {
 		// Allocate some memory here. This will work.
@@ -87,9 +93,10 @@ context.
 Objects that deallocate upon `Drop` can be wrapped in `PermitDrop`:
 
 ```rust
+use nih_assert_no_alloc::*;
 let foo = PermitDrop::new(
     permit_alloc(||
-        Box::new(...)
+        Box::new(42u32)
     )
 );
 ```
@@ -123,7 +130,7 @@ These compile time features are not enabled by default:
 Examples
 --------
 
-See [examples/main.rs](https://github.com/Windfisch/rust-assert-no-alloc/blob/master/examples/main.rs) for an example.
+See [examples/main.rs](https://github.com/BillyDM/nih-assert-no-alloc/blob/master/examples/main.rs) for an example.
 
 You can try out the different feature flags:
 

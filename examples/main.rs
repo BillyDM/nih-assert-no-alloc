@@ -1,4 +1,4 @@
-use assert_no_alloc::*;
+use nih_assert_no_alloc::*;
 
 #[cfg(debug_assertions)]
 #[global_allocator]
